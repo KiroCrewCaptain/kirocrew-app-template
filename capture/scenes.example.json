@@ -1,0 +1,141 @@
+{
+  "app": "my-app",
+  "fixture": "minimal",
+  "locale": "en-US",
+  "timezone": "UTC",
+  "provenance_note": "Describe which copy of the app the gateway served (for example: the built-in copy in the Kiro Crew checkout, or this repository installed into the throwaway home).",
+  "data_notes": [
+    "Anything about the demo data a reader should know, e.g. dates the app stamps with the gateway's clock."
+  ],
+  "init_storage": {
+    "mc-nav": "0"
+  },
+  "ready": "text=My App",
+  "forbid_text": [
+    "Loading..."
+  ],
+  "setup": [
+    {
+      "name": "turn the app on",
+      "method": "POST",
+      "path": "/api/apps/my-app/enable"
+    },
+    {
+      "name": "retire the host's one-time startup intro",
+      "method": "POST",
+      "path": "/api/feature-videos/feedback",
+      "body": {
+        "id": "crewmates",
+        "status": "dismissed"
+      },
+      "optional": true
+    },
+    {
+      "name": "create a demo item",
+      "method": "POST",
+      "path": "/api/apps/my-app/items",
+      "body": {
+        "title": "Water the balcony tomatoes"
+      },
+      "save": {
+        "item_id": "id"
+      }
+    },
+    {
+      "wait_ms": 1100
+    },
+    {
+      "name": "mark it done",
+      "method": "PUT",
+      "path": "/api/apps/my-app/items/{{item_id}}",
+      "body": {
+        "done": true
+      }
+    }
+  ],
+  "setup_when_not_built_in": [
+    {
+      "name": "install this repository",
+      "method": "POST",
+      "path": "/api/apps/install",
+      "body": {
+        "source": "{{app_root}}"
+      }
+    },
+    {
+      "name": "trust it (only if it runs its own code)",
+      "method": "POST",
+      "path": "/api/security/trusted-apps/my-app"
+    },
+    {
+      "name": "turn the app on",
+      "method": "POST",
+      "path": "/api/apps/my-app/enable"
+    }
+  ],
+  "_setup_when_not_built_in_note": "capture.py ignores the key above. Once Kiro Crew no longer ships this app built in, replace the 'turn the app on' step in setup with these three steps.",
+  "screenshots": [
+    {
+      "name": "hero",
+      "path": "/my-app",
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "ready_after": "text=Water the balcony tomatoes",
+      "alt": "The My App page listing one finished demo item, Water the balcony tomatoes"
+    },
+    {
+      "name": "use-case-1",
+      "path": "/my-app",
+      "themes": [
+        "light"
+      ],
+      "steps": [
+        {
+          "click": "role=button[name='New item']"
+        },
+        {
+          "fill": "input[name='title']",
+          "value": "Book the bike service"
+        }
+      ],
+      "alt": "The New item form with the title Book the bike service typed in"
+    }
+  ],
+  "walkthrough": {
+    "name": "walkthrough",
+    "theme": "light",
+    "path": "/my-app",
+    "alt": "A short walkthrough of My App",
+    "steps": [
+      {
+        "caption": "Everything you track, in one list"
+      },
+      {
+        "wait_ms": 2000
+      },
+      {
+        "caption": "Add one"
+      },
+      {
+        "click": "role=button[name='New item']"
+      },
+      {
+        "type": "input[name='title']",
+        "value": "Book the bike service"
+      },
+      {
+        "press": "input[name='title']",
+        "key": "Enter"
+      },
+      {
+        "wait_for": "text=Book the bike service"
+      },
+      {
+        "wait_ms": 1500
+      }
+    ]
+  },
+  "_live_note": "A screenshot or the walkthrough that shows an agent conversation sets \"live\": true: capture.py then runs that scene against your installed, signed-in kiro-cli with model auto. Replies are the model's own and vary per run; re-read them and update the alt text and README after every capture."
+}
