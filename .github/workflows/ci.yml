@@ -1,11 +1,12 @@
 name: CI
 
-# Template CI for a Kiro Crew app repository. Two jobs:
+# Template CI for a Kiro Crew app repository. Three jobs:
 #   test    the app's own tests, on every OS the manifest's `platform.os` names.
+#   internal-content-scan  Kiro Crew's shared gate over each diff's added lines.
 #   readme  the mechanical half of CHECKLIST.md (sections, placeholders, alt text,
 #           referenced media exist and fit their budgets).
 #
-# Neither job boots Kiro Crew or records media: capture is a local step
+# No job boots Kiro Crew or records media: capture is a local step
 # (capture/README.md), and its output is committed under docs/media/.
 on:
   push:
