@@ -612,6 +612,20 @@ def sign_in(context: Any, gateway: Gateway) -> Any:
 
 
 def api_call(page: Any, method: str, path: str, body: Any) -> tuple[int, Any]:
+    # The dashboard can navigate itself right after sign-in, which destroys the
+    # page's execution context mid-evaluate; wait for the load and retry.
+    for attempt in range(3):
+        page.wait_for_load_state("load")
+        try:
+            return _api_call(page, method, path, body)
+        except Exception as exc:
+            if "Execution context was destroyed" not in str(exc) or attempt == 2:
+                raise
+            page.wait_for_timeout(1000)
+    raise AssertionError("unreachable")
+
+
+def _api_call(page: Any, method: str, path: str, body: Any) -> tuple[int, Any]:
     result = page.evaluate(
         """async ([method, path, body]) => {
             const init = { method, credentials: 'same-origin', headers: {} };
